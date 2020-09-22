@@ -3,6 +3,7 @@ package Utils;
 import com.alibaba.fastjson.JSONObject;
 
 public class JsonUtils {
+
     public static JSONObject JsonToObject(String json){
         return JSONObject.parseObject(json);
     }
