@@ -5,10 +5,21 @@ import com.alibaba.fastjson.JSONObject;
 public class JsonUtils {
 
     public static JSONObject JsonToObject(String json){
-        return JSONObject.parseObject(json);
+        JSONObject res = null;
+        System.out.println(json);
+        try{
+            res = JSONObject.parseObject(json);
+            return res;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public  static void printJObject(JSONObject jb, StringBuffer prefix){
+        if(jb == null){
+            return ;
+        }
         System.out.println("{");
         prefix.append("\t");
         for(JSONObject.Entry<String, Object> entry : jb.entrySet()){

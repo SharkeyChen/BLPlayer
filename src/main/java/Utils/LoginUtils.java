@@ -26,9 +26,12 @@ public class LoginUtils {
      * oauthKey在180秒后过期
      * @throws IOException
      */
-    public static JSONObject getQrCodeUrl() throws IOException {
-        String data = HttpClientUtils.sendGet(qrCodeUrl);
-        JSONObject jb = JsonUtils.JsonToObject(data);
+    public static JSONObject getQrCodeUrl(){
+        JSONObject jb = HttpClientUtils.httpGetJSONObject(qrCodeUrl, null, true);
+        JsonUtils.printJObject(jb, new StringBuffer());
+        if(jb == null){
+            return null;
+        }
         JSONObject resp = new JSONObject();
         String url = (String)jb.getJSONObject("data").get("url");
         String oauthKey = (String)jb.getJSONObject("data").get("oauthKey");
@@ -43,9 +46,9 @@ public class LoginUtils {
      * @return 返回是否成功登陆，若登陆成功，则返回用户信息（保存在data中的url里）
      * @throws IOException
      */
-    public static JSONObject getLoginInfo(String oauthKey) throws IOException {
-        String data = HttpClientUtils.sendPost(qrCodeInfo + "?oauthKey=" + oauthKey);
-        return JsonUtils.JsonToObject(data);
+    public static JSONObject getLoginInfo(String oauthKey){
+        JSONObject res = HttpClientUtils.httpPostJSONObject(qrCodeInfo + "?oauthKey=" + oauthKey, null);
+        return res;
     }
 
 }

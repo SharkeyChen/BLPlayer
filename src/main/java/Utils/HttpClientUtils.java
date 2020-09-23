@@ -1,89 +1,168 @@
 package Utils;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.params.HttpMethodParams;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Author：Sharkey
  * Date：2020/08/18
+ * Request请求工具类
  */
 
 public class HttpClientUtils {
-    public static String sendPost(String urlParam) throws HttpException, IOException {
-        // 创建httpClient实例对象
-        HttpClient httpClient = new HttpClient();
-        // 设置httpClient连接主机服务器超时时间：15000毫秒
-        httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(15000);
-        // 创建post请求方法实例对象
-        PostMethod postMethod = new PostMethod(urlParam);
-        // 设置post请求超时时间
-        postMethod.getParams().setParameter(HttpMethodParams.SO_TIMEOUT, 60000);
-        postMethod.addRequestHeader("Content-Type", "application/json");
 
-        httpClient.executeMethod(postMethod);
-
-        String result = postMethod.getResponseBodyAsString();
-        postMethod.releaseConnection();
-        return result;
+    /**
+     * 发送Get请求，返回String
+     * @param url
+     * @param param
+     * @return
+     */
+    public static String httpGetString(String url, JSONObject param){
+        return httpGetString(url, param, true);
     }
 
-    public static String sendGet(String urlParam) throws HttpException, IOException {
-        // 创建httpClient实例对象
-        HttpClient httpClient = new HttpClient();
-        // 设置httpClient连接主机服务器超时时间：15000毫秒
-        httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(15000);
-        // 创建GET请求方法实例对象
-        GetMethod getMethod = new GetMethod(urlParam);
-        // 设置post请求超时时间
-        getMethod.getParams().setParameter(HttpMethodParams.SO_TIMEOUT, 60000);
-        getMethod.addRequestHeader("Content-Type", "application/json");
-        httpClient.executeMethod(getMethod);
 
-//        String result = getMethod.getResponseBodyAsString();
-        InputStream in  = getMethod.getResponseBodyAsStream();
-        ByteArrayOutputStream result = new ByteArrayOutputStream();
-        byte[] bytes = new byte[1024];
-        int len = -1;
-        while((len = in.read(bytes)) != -1){
-            result.write(bytes,0, len);
-        }
-        in.close();
-        getMethod.releaseConnection();
-        return result.toString();
-    }
-
-    public static void DownLoadVideos(String url) throws IOException {
-        HttpClient httpClient = new HttpClient();
-        httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(15000);
-        GetMethod getMethod = new GetMethod(url);
-        getMethod.getParams().setParameter(HttpMethodParams.SO_TIMEOUT, 60000);
-        getMethod.addRequestHeader("Origin", " https://www.bilibili.com");
-        getMethod.addRequestHeader("Referer", "https://www.bilibili.com");
-
-        httpClient.executeMethod(getMethod);
-
-        File file = new File("C:\\Users\\DELL\\Desktop\\123.flv");
-        if(!file.exists()){
-            file.createNewFile();
-        }
+    /**
+     * 发送Get请求，根据needResponse来决定是否返回字符串，若为false，返回null
+     * @param url
+     * @param param
+     * @param needResponse
+     * @return
+     */
+    public static String httpGetString(String url, JSONObject param, boolean needResponse){
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        String str = "";
+        HttpGet method = new HttpGet(url);
         try{
-            FileOutputStream fos = new FileOutputStream(file);
-            InputStream in  = getMethod.getResponseBodyAsStream();
-            byte[] bytes = new byte[1024];
-            int len = -1;
-            while((len = in.read(bytes)) != -1){
-                fos.write(bytes, 0 , len);
+            if(null != param){
+                for(JSONObject.Entry<String, Object> entry : param.entrySet()){
+                    method.setHeader(entry.getKey(), entry.getValue().toString());
+                }
             }
-            in.close();
-            fos.close();
-        }catch (Exception e){
-
+            HttpResponse result = httpClient.execute(method);
+            try{
+                str = EntityUtils.toString(result.getEntity());
+                String encode = EncodeUtils.getEncoding(str);
+                System.out.println(encode);
+                if(!(encode.equals("utf-8") || encode.equals("UTF-8") || encode.equals("GB2312"))){
+                    str = new String(str.getBytes(encode), StandardCharsets.UTF_8);
+                }
+                if(!needResponse){
+                    return "";
+                }
+                return str;
+            }catch(Exception e){
+                e.printStackTrace();
+                return "";
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
         }
+    }
+
+
+    /**
+     * 发送Get请求，返回JSONObject
+     * @param url
+     * @param param
+     * @return
+     */
+    public static JSONObject httpGetJSONObject(String url, JSONObject param){
+        return JsonUtils.JsonToObject(httpGetString(url, param, true));
+    }
+
+
+    /**
+     * 发送Get请求，根据needResponse来返回类型，若为false,返回null
+     * @param url
+     * @param param
+     * @param needResponse
+     * @return
+     */
+    public static JSONObject httpGetJSONObject(String url, JSONObject param, boolean needResponse){
+        return JsonUtils.JsonToObject(httpGetString(url, param, needResponse));
+    }
+
+
+    /**
+     * 发送Post请求，返回根据needResponse来返回字符串，若为false,返回null
+     * @param url
+     * @param param
+     * @param needResponse
+     * @return
+     */
+    public static String httpPostString(String url, JSONObject param, boolean needResponse){
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        String str = "";
+        HttpPost method = new HttpPost(url);
+        try{
+            if(null != param){
+                for(JSONObject.Entry<String, Object> entry : param.entrySet()){
+                    method.setHeader(entry.getKey(), entry.getValue().toString());
+                }
+            }
+            HttpResponse result = httpClient.execute(method);
+            try{
+                str = EntityUtils.toString(result.getEntity());
+                String encode = EncodeUtils.getEncoding(str);
+                if(!(encode.equals("utf-8") || encode.equals("UTF-8"))){
+                    str = new String(str.getBytes(encode), StandardCharsets.UTF_8);
+                }
+                if(!needResponse){
+                    return "";
+                }
+                return str;
+            }catch(Exception e){
+                e.printStackTrace();
+                return "";
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+
+    /**
+     * 发送Post请求，返回String
+     * @param url
+     * @param param
+     * @return
+     */
+    public static String httpPostString(String url, JSONObject param){
+        return httpPostString(url, param, true);
+    }
+
+
+    /**
+     * 发送Post请求，返回JSONObject
+     * @param url
+     * @param param
+     * @return
+     */
+    public static JSONObject httpPostJSONObject(String url, JSONObject param){
+        return JsonUtils.JsonToObject(httpPostString(url, param, true));
+    }
+
+
+    /**
+     * 发送Post请求，返回根据needResponse来返回JSONObject，若为false,返回null
+     * @param url
+     * @param param
+     * @param needResponse
+     * @return
+     */
+    public static JSONObject httpPostJSONObject(String url, JSONObject param, boolean needResponse){
+        return JsonUtils.JsonToObject(httpPostString(url, param, needResponse));
     }
 
 }
