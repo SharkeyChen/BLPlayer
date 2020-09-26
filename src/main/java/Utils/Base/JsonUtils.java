@@ -1,9 +1,20 @@
-package Utils;
+package Utils.Base;
 
 import com.alibaba.fastjson.JSONObject;
 
+/**
+ * Author：Sharkey
+ * Date：2020/09/24
+ * 处理JSONObject的工具类
+ */
+
 public class JsonUtils {
 
+    /**
+     * 将字符串转换为JSONObject
+     * @param json
+     * @return JSONObject
+     */
     public static JSONObject JsonToObject(String json){
         JSONObject res = null;
         System.out.println(json);
@@ -16,6 +27,11 @@ public class JsonUtils {
         }
     }
 
+    /**
+     * 将JSONObject格式化输出到控制台
+     * @param jb
+     * @param prefix
+     */
     public  static void printJObject(JSONObject jb, StringBuffer prefix){
         if(jb == null){
             return ;

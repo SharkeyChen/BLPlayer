@@ -1,10 +1,10 @@
 package Utils;
 
+import Utils.Base.HttpClientUtils;
+import Utils.Base.JsonUtils;
 import com.alibaba.fastjson.JSONObject;
-import com.google.zxing.WriterException;
 
 import java.io.IOException;
-import java.util.Scanner;
 
 
 /**

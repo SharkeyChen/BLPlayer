@@ -1,4 +1,4 @@
-package Utils;
+package Utils.Base;
 
 /**
  * Author:Sharkey
@@ -10,11 +10,6 @@ public class EncodeUtils {
 
     private static String[] encodeList = {"GB2312", "ISO-8859-1", "UTF-8", "GBK"};
 
-//    public static String adjustEncode(String str){
-//        String encode = getEncoding(str);
-//
-//    }
-//
     /**
      * 获取字符串的编码集,如果不存在，则返回一个空字符串
      * @param str

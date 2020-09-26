@@ -1,5 +1,5 @@
 import Utils.BarrageUtils;
-import Utils.HttpClientUtils;
+import Utils.Base.HttpClientUtils;
 import com.alibaba.fastjson.JSONObject;
 
 import java.util.Scanner;

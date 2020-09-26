@@ -1,4 +1,4 @@
-package Utils;
+package Utils.Base;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;

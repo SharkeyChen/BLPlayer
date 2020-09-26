@@ -1,6 +1,7 @@
-package Utils;
+package Utils.Base;
 
 import com.alibaba.fastjson.JSONObject;
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -51,7 +52,6 @@ public class HttpClientUtils {
             try{
                 str = EntityUtils.toString(result.getEntity());
                 String encode = EncodeUtils.getEncoding(str);
-                System.out.println(encode);
                 if(!(encode.equals("utf-8") || encode.equals("UTF-8") || encode.equals("GB2312"))){
                     str = new String(str.getBytes(encode), StandardCharsets.UTF_8);
                 }

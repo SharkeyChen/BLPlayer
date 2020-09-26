@@ -1,6 +1,6 @@
-import Utils.JsonUtils;
+import Utils.Base.JsonUtils;
 import Utils.LoginUtils;
-import Utils.QRCodeUtils;
+import Utils.Base.QRCodeUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.google.zxing.WriterException;
 
